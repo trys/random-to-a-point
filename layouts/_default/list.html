@@ -1,0 +1,12 @@
+{{ define "main" }}
+	<div class="posts wrap">
+		{{ range .Pages }}
+			<article class="post">
+				<h2>
+					<a href="{{ .URL }}">{{ .Title }}</a>
+				</h2>
+				<time>{{ .Date.Format "Monday, Jan 2, 2006" }}</time>
+			</article>
+		{{ end }}
+	</div>
+{{ end }}

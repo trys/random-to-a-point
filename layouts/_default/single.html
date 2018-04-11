@@ -1,0 +1,62 @@
+{{ define "main" }}
+	<header class="post__header">
+		<h1>{{ .Title }}</h1>
+		{{/*
+		First, we hash the title with MD5 and split after each letter.
+
+		To get the two colours:
+			- Get the first character from the hash
+			- Base16 it using printf, ensuring the character is a number
+			- Modulus it against the total number of predefined colours
+			- This gives us an index between 0 and the total number of colours
+			- Select the colour with that index
+
+		The same approach is used for the SVG, but we have to do some extra escaping.
+		Go is very picky about what HTML can be altered to cut down on XSS attacks.
+		So we convert the URL encoded characters and substite in our secondary colour.
+		Then base64 the final result into a CSS custom property.
+		*/}}
+		{{ $hash := split (md5 .Title) "" }}
+		{{ $totalColours := len .Site.Data.bg.colours }}
+
+		{{ $primaryIndex := index $hash 1 }}
+		{{ $basedPrimaryIndex := printf "%x" $primaryIndex }}
+		{{ $modIndex := mod $basedPrimaryIndex $totalColours }}
+		{{ $primary := index .Site.Data.bg.colours $modIndex }}
+
+		
+		{{ $secondaryIndex := index $hash 2 }}
+		{{ $basedSecondaryIndex := printf "%x" $secondaryIndex }}
+		{{ $modIndex := mod $basedSecondaryIndex $totalColours }}
+		{{ $secondary := index .Site.Data.bg.colours $modIndex }}
+
+
+		{{ $bgIndex := mod (printf "%x" (index $hash 0)) (len .Site.Data.bg.patterns) }}
+		{{ $bg := replace (replace (replace (replace (index .Site.Data.bg.patterns $bgIndex) "%3C" "<") "%3E" ">") "%23" "" | safeHTML) "data:image/svg+xml," "" }}
+		{{ $colouredBg := replace $bg "9C92AC" $secondary }}
+		<style>
+			.post__header {
+				--color: {{ $primary }};
+				--bg: url("data:image/svg+xml;charset=utf-8;base64,{{ base64Encode $colouredBg }}");
+			}
+		</style>
+	</header>
+	<nav>
+		<div class="wrap">
+			{{ if .NextInSection }}
+				<a class="traverse" href="{{ .NextInSection.URL }}">Next Post</a>
+			{{ else }}
+				<span>Next Post</span>
+			{{ end }}
+			
+			{{ if .PrevInSection }}
+				<a class="traverse" href="{{ .PrevInSection.URL }}">Previous Post</a>
+			{{ else }}
+				<span>Previous Post</span>
+			{{ end }}
+		</div>
+	</nav>
+	<div class="wrap">
+		{{ .Content }}
+	</div>
+{{ end }}
