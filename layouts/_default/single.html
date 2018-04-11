@@ -44,15 +44,15 @@
 	<nav>
 		<div class="wrap">
 			{{ if .NextInSection }}
-				<a class="traverse" href="{{ .NextInSection.URL }}">Next Post</a>
+				<a class="traverse" href="{{ .NextInSection.URL }}">Previous Post</a>
 			{{ else }}
-				<span>Next Post</span>
+				<span>Previous Post</span>
 			{{ end }}
 			
 			{{ if .PrevInSection }}
-				<a class="traverse" href="{{ .PrevInSection.URL }}">Previous Post</a>
+				<a class="traverse" href="{{ .PrevInSection.URL }}">Next Post</a>
 			{{ else }}
-				<span>Previous Post</span>
+				<span>Next Post</span>
 			{{ end }}
 		</div>
 	</nav>
